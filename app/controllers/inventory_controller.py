@@ -1,7 +1,6 @@
-# Module quan ly kho hang - cap nhat ngay 12/09/2026
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from app.models.inventory import InventoryItem, InventoryTransaction, TX_NHAP, TX_XUAT
+from app.models.inventory import InventoryItem, InventoryTransaction, TX_NHAP
 from app.models.user import ROLE_ADMIN, ROLE_MANAGER
 from app.controllers.decorators import roles_required
 

@@ -32,8 +32,13 @@ def add_category():
 @login_required
 @roles_required(ROLE_ADMIN, ROLE_MANAGER)
 def delete_category(cat_id):
-    Category.delete(cat_id)
-    flash('Đã xóa danh mục.', 'info')
+    items_in_category = [i for i in MenuItem.get_all() if str(i.get('category_id')) == cat_id]
+    if items_in_category:
+        flash(f'Không thể xóa: còn {len(items_in_category)} món thuộc danh mục này. '
+              f'Hãy xóa hoặc chuyển các món đó sang danh mục khác trước.', 'danger')
+    else:
+        Category.delete(cat_id)
+        flash('Đã xóa danh mục.', 'info')
     return redirect(url_for('menu.index'))
 
 

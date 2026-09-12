@@ -56,12 +56,18 @@ def add_item(table_id):
         order_id_str = str(Order.create_order(table_id, current_user.id))
 
     item_id = request.form.get('item_id')
-    qty = request.form.get('qty', 1)
     note = request.form.get('note', '')
+
+    try:
+        qty = int(request.form.get('qty', 1))
+    except (TypeError, ValueError):
+        qty = 0
 
     menu_item = MenuItem.find_by_id(item_id)
     if not menu_item:
         flash('Món không tồn tại.', 'danger')
+    elif qty <= 0:
+        flash('Số lượng phải lớn hơn 0.', 'danger')
     else:
         Order.add_item(order_id_str, menu_item, qty, note)
         flash(f'Đã thêm "{menu_item["name"]}" vào đơn.', 'success')
@@ -149,7 +155,6 @@ def invoice_detail(invoice_id):
 @login_required
 @roles_required(ROLE_ADMIN, ROLE_MANAGER)
 def cancel_order(order_id):
-    order = Order.find_by_id(order_id)
     Order.cancel(order_id)
     flash('Đã hủy đơn hàng.', 'info')
     return redirect(url_for('order.table_grid'))
