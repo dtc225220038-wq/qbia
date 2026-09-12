@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Bếp / Quầy bar{% endblock %}
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-fire"></i> Hàng đợi chế biến</h3>
+
+<div class="row g-3">
+    {% for order in orders %}
+    {% set table = tables.get(order.table_id | string) %}
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>{{ table.name if table else 'Bàn ?' }}</h5>
+            <ul class="list-group list-group-flush">
+                {% for line in order['items'] %}
+                {% if line.status == ITEM_DANG_CHE_BIEN %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-bold">{{ line.name }} x{{ line.qty }}</div>
+                        {% if line.note %}<div class="text-muted small">{{ line.note }}</div>{% endif %}
+                    </div>
+                    <form method="POST" action="{{ url_for('order.update_item_status', order_id=order._id, idx=loop.index0) }}">
+                        <input type="hidden" name="status" value="{{ ITEM_DA_PHUC_VU }}">
+                        <input type="hidden" name="next" value="{{ url_for('order.kitchen_queue') }}">
+                        <button class="btn btn-sm btn-success">Xong <i class="bi bi-check-lg"></i></button>
+                    </form>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center text-muted py-5">Không có món nào đang chờ chế biến. 🎉</div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Hóa đơn{% endblock %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width: 500px;">
+    <div class="text-center mb-3">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+        <h4 class="mt-2">Thanh toán thành công</h4>
+        <div class="text-muted small">{{ invoice.paid_at | datetime_vn }}</div>
+    </div>
+    <ul class="list-group list-group-flush mb-3">
+        {% for line in invoice['items'] %}
+        <li class="list-group-item d-flex justify-content-between">
+            <span>{{ line.name }} x{{ line.qty }}</span>
+            <span>{{ (line.price * line.qty) | currency }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="d-flex justify-content-between">
+        <span>Tạm tính</span><span>{{ invoice.subtotal | currency }}</span>
+    </div>
+    <div class="d-flex justify-content-between text-danger">
+        <span>Giảm giá ({{ invoice.discount_percent }}%)</span><span>-{{ invoice.discount_amount | currency }}</span>
+    </div>
+    <div class="d-flex justify-content-between fs-4 fw-bold border-top pt-2 mt-2">
+        <span>Tổng cộng</span><span>{{ invoice.total | currency }}</span>
+    </div>
+    <div class="text-muted mt-2">Hình thức: {{ payment_labels.get(invoice.payment_method, invoice.payment_method) }}</div>
+
+    <a href="{{ url_for('order.table_grid') }}" class="btn btn-primary mt-4">Về sơ đồ bàn</a>
+</div>
+{% endblock %}

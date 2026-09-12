@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}{{ table.name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3><i class="bi bi-table"></i> {{ table.name }}</h3>
+    <a href="{{ url_for('order.table_grid') }}" class="btn btn-outline-secondary btn-sm">&larr; Quay lại sơ đồ bàn</a>
+</div>
+
+{% if not order %}
+<div class="card p-4 text-center">
+    <p class="text-muted">Bàn này chưa có đơn nào đang mở.</p>
+    <form method="POST" action="{{ url_for('order.open_order', table_id=table._id) }}">
+        <button class="btn btn-success">Mở đơn mới cho bàn này</button>
+    </form>
+</div>
+{% else %}
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card p-3 mb-3">
+            <h5>Gọi món</h5>
+            <form method="POST" action="{{ url_for('order.add_item', table_id=table._id) }}" class="row g-2 align-items-end">
+                <input type="hidden" name="order_id" value="{{ order._id }}">
+                <div class="col-6">
+                    <label class="form-label small">Món</label>
+                    <select name="item_id" class="form-select" required>
+                        {% for cat in categories %}
+                        <optgroup label="{{ cat.name }}">
+                            {% for mi in menu_items if mi.category_id == cat._id %}
+                            <option value="{{ mi._id }}">{{ mi.name }} - {{ mi.price | currency }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                        <optgroup label="Khác">
+                            {% for mi in menu_items if not mi.category_id %}
+                            <option value="{{ mi._id }}">{{ mi.name }} - {{ mi.price | currency }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <label class="form-label small">SL</label>
+                    <input type="number" name="qty" class="form-control" value="1" min="1" required>
+                </div>
+                <div class="col-3">
+                    <label class="form-label small">Ghi chú</label>
+                    <input type="text" name="note" class="form-control" placeholder="Ít đá, cay...">
+                </div>
+                <div class="col-1">
+                    <button class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card p-3">
+            <h5>Đơn hàng hiện tại</h5>
+            <ul class="list-group list-group-flush mb-3">
+                {% for line in order['items'] %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-bold">{{ line.name }} x{{ line.qty }}</div>
+                        {% if line.note %}<div class="text-muted small">Ghi chú: {{ line.note }}</div>{% endif %}
+                        {% if line.status == 'dang_che_bien' %}
+                        <span class="badge bg-warning text-dark badge-status">Đang chế biến</span>
+                        {% else %}
+                        <span class="badge bg-success badge-status">Đã phục vụ</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-end">
+                        <div>{{ (line.price * line.qty) | currency }}</div>
+                        <form method="POST" action="{{ url_for('order.remove_item', order_id=order._id, idx=loop.index0) }}"
+                              onsubmit="return confirm('Xóa món này khỏi đơn?');">
+                            <button class="btn btn-sm btn-link text-danger p-0">Xóa</button>
+                        </form>
+                    </div>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">Chưa có món nào.</li>
+                {% endfor %}
+            </ul>
+            <div class="d-flex justify-content-between fs-5 fw-bold mb-3">
+                <span>Tạm tính</span>
+                <span>{{ subtotal | currency }}</span>
+            </div>
+            {% if current_user.role in [ROLE_ADMIN, ROLE_MANAGER, ROLE_CASHIER] %}
+            <a href="{{ url_for('order.checkout', order_id=order._id) }}" class="btn btn-warning fw-bold" style="background-color:#c8791a;border:none;color:white;">
+                <i class="bi bi-cash-coin"></i> Thanh toán
+            </a>
+            {% endif %}
+            {% if current_user.role in [ROLE_ADMIN, ROLE_MANAGER] %}
+            <form method="POST" action="{{ url_for('order.cancel_order', order_id=order._id) }}" class="mt-2"
+                  onsubmit="return confirm('Hủy toàn bộ đơn hàng này?');">
+                <button class="btn btn-outline-danger w-100">Hủy đơn</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

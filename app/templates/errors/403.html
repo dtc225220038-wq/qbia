@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Không có quyền truy cập{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+    <i class="bi bi-shield-lock" style="font-size: 4rem; color: #e74c3c;"></i>
+    <h2 class="mt-3">403 - Bạn không có quyền truy cập trang này</h2>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary mt-3">Về trang chủ</a>
+</div>
+{% endblock %}

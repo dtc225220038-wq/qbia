@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý bàn{% endblock %}
+{% block content %}
+<h3 class="mb-4">Quản lý bàn</h3>
+
+<div class="card p-3 mb-4" style="max-width: 500px;">
+    <h6>Thêm bàn mới</h6>
+    <form method="POST" action="{{ url_for('table.add') }}" class="row g-2">
+        <div class="col-6">
+            <input type="text" name="name" class="form-control" placeholder="Tên bàn (VD: Bàn 11)" required>
+        </div>
+        <div class="col-4">
+            <input type="number" name="capacity" class="form-control" placeholder="Số chỗ" value="4" min="1">
+        </div>
+        <div class="col-2">
+            <button class="btn btn-primary w-100">Thêm</button>
+        </div>
+    </form>
+</div>
+
+<div class="table-responsive">
+<table class="table table-hover bg-white">
+    <thead class="table-light">
+        <tr><th>Tên bàn</th><th>Sức chứa</th><th>Trạng thái</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for t in tables %}
+        <tr>
+            <td>{{ t.name }}</td>
+            <td>{{ t.capacity }} chỗ</td>
+            <td>
+                {% if t.status == 'trong' %}
+                <span class="badge bg-success">Trống</span>
+                {% else %}
+                <span class="badge bg-danger">Đang phục vụ</span>
+                {% endif %}
+            </td>
+            <td class="text-end">
+                <form method="POST" action="{{ url_for('table.delete', table_id=t._id) }}" class="d-inline"
+                      onsubmit="return confirm('Xóa bàn này?');">
+                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

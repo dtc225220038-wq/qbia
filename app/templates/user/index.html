@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý nhân sự{% endblock %}
+{% block content %}
+<h3 class="mb-4">Quản lý nhân sự / tài khoản</h3>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="table-responsive">
+        <table class="table table-hover bg-white align-middle">
+            <thead class="table-light">
+                <tr><th>Họ tên</th><th>Tên đăng nhập</th><th>Vai trò</th><th>SĐT</th><th>Trạng thái</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>{{ u.full_name }}</td>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.role_label }}</td>
+                    <td>{{ u.data.get('phone', '') }}</td>
+                    <td>
+                        {% if u.is_active_account %}
+                        <span class="badge bg-success">Đang hoạt động</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Đã khóa</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#edit-{{ u.id }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <div class="modal fade" id="edit-{{ u.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="POST" action="{{ url_for('user.edit', user_id=u.id) }}">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Sửa: {{ u.full_name }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-2">
+                                        <label class="form-label">Họ tên</label>
+                                        <input type="text" name="full_name" class="form-control" value="{{ u.full_name }}">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Vai trò</label>
+                                        <select name="role" class="form-select">
+                                            {% for r in roles %}
+                                            <option value="{{ r }}" {% if r == u.role %}selected{% endif %}>{{ role_labels[r] }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">SĐT</label>
+                                        <input type="text" name="phone" class="form-control" value="{{ u.data.get('phone', '') }}">
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" name="active" id="active-{{ u.id }}" {% if u.is_active_account %}checked{% endif %}>
+                                        <label class="form-check-label" for="active-{{ u.id }}">Đang hoạt động</label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </form>
+                            <form method="POST" action="{{ url_for('user.reset_password', user_id=u.id) }}" class="p-3 border-top">
+                                <label class="form-label small">Đặt lại mật khẩu</label>
+                                <div class="input-group">
+                                    <input type="text" name="new_password" class="form-control" placeholder="Mật khẩu mới" required>
+                                    <button class="btn btn-outline-danger">Đặt lại</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card p-3">
+            <h6>Thêm nhân viên mới</h6>
+            <form method="POST" action="{{ url_for('user.add') }}">
+                <input type="text" name="full_name" class="form-control mb-2" placeholder="Họ tên" required>
+                <input type="text" name="username" class="form-control mb-2" placeholder="Tên đăng nhập" required>
+                <input type="password" name="password" class="form-control mb-2" placeholder="Mật khẩu" required>
+                <select name="role" class="form-select mb-2" required>
+                    {% for r in roles %}
+                    <option value="{{ r }}">{{ role_labels[r] }}</option>
+                    {% endfor %}
+                </select>
+                <input type="text" name="phone" class="form-control mb-2" placeholder="Số điện thoại">
+                <button class="btn btn-primary w-100">Tạo tài khoản</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

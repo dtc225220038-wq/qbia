@@ -1,0 +1,53 @@
+:root {
+    --beer-amber: #c8791a;
+    --beer-dark: #4a2c14;
+    --beer-foam: #fff8ec;
+}
+
+body {
+    background-color: var(--beer-foam);
+}
+
+.bg-beer {
+    background: linear-gradient(90deg, var(--beer-dark), var(--beer-amber));
+}
+
+.card-table {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border: none;
+    border-radius: 14px;
+}
+
+.card-table:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-table.trong {
+    background-color: #e9f7ef;
+    border-left: 6px solid #2ecc71;
+}
+
+.card-table.dang_phuc_vu {
+    background-color: #fdecea;
+    border-left: 6px solid #e74c3c;
+}
+
+.badge-status {
+    font-size: 0.8rem;
+}
+
+.low-stock-row {
+    background-color: #fff3cd !important;
+}
+
+.dashboard-stat {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.navbar-brand {
+    letter-spacing: 0.5px;
+}

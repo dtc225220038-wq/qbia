@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Chấm công nhân viên{% endblock %}
+{% block content %}
+<h3 class="mb-4">Chấm công toàn bộ nhân viên</h3>
+
+<form method="GET" class="row g-2 mb-4" style="max-width: 500px;">
+    <div class="col-5">
+        <label class="form-label small">Từ ngày</label>
+        <input type="date" name="from" class="form-control" value="{{ date_from or '' }}">
+    </div>
+    <div class="col-5">
+        <label class="form-label small">Đến ngày</label>
+        <input type="date" name="to" class="form-control" value="{{ date_to or '' }}">
+    </div>
+    <div class="col-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100">Lọc</button>
+    </div>
+</form>
+
+<h5>Tổng hợp theo nhân viên (làm cơ sở tính lương)</h5>
+<div class="table-responsive mb-4">
+<table class="table table-hover bg-white">
+    <thead class="table-light"><tr><th>Nhân viên</th><th>Số ca</th><th>Tổng giờ làm</th></tr></thead>
+    <tbody>
+        {% for uid, s in summary.items() %}
+        <tr>
+            <td>{{ users[uid].full_name if uid in users else uid }}</td>
+            <td>{{ s.shifts }}</td>
+            <td>{{ s.hours | round(2) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="text-center text-muted py-4">Không có dữ liệu trong khoảng thời gian này.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<h5>Chi tiết từng ca</h5>
+<div class="table-responsive">
+<table class="table table-hover bg-white">
+    <thead class="table-light"><tr><th>Nhân viên</th><th>Check-in</th><th>Check-out</th><th>Số giờ</th></tr></thead>
+    <tbody>
+        {% for r in records %}
+        <tr>
+            <td>{{ users[r.user_id | string].full_name if (r.user_id | string) in users else '—' }}</td>
+            <td>{{ r.check_in | datetime_vn }}</td>
+            <td>{{ r.check_out | datetime_vn if r.check_out else '—' }}</td>
+            <td>{{ r.hours if r.hours is not none else '—' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

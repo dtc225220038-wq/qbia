@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quản lý Quán bia{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-beer sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="{{ url_for('main.dashboard') }}">
+            <i class="bi bi-cup-straw"></i> Quán Bia Manager
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint=='main.dashboard' %}active{% endif %}" href="{{ url_for('main.dashboard') }}">Tổng quan</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.blueprint=='order' %}active{% endif %}" href="{{ url_for('order.table_grid') }}">Gọi món / Bàn</a>
+                </li>
+                {% if current_user.role in [ROLE_ADMIN, ROLE_MANAGER, ROLE_KITCHEN, ROLE_STAFF] %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('order.kitchen_queue') }}">Bếp / Bar</a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.blueprint=='menu' %}active{% endif %}" href="{{ url_for('menu.index') }}">Thực đơn</a>
+                </li>
+                {% if current_user.role in [ROLE_ADMIN, ROLE_MANAGER] %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('inventory.index') }}">Kho hàng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('table.manage') }}">Quản lý bàn</a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.blueprint=='attendance' %}active{% endif %}" href="{{ url_for('attendance.my_attendance') }}">Chấm công</a>
+                </li>
+                {% if current_user.role in [ROLE_ADMIN, ROLE_MANAGER] %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Báo cáo</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('report.revenue') }}">Doanh thu</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('report.inventory_report') }}">Tồn kho</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('attendance.all_attendance') }}">Chấm công nhân viên</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+                {% if current_user.role == ROLE_ADMIN %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('user.index') }}">Nhân sự</a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <span class="navbar-text text-white-50 me-3">
+                        <i class="bi bi-person-circle"></i> {{ current_user.full_name }} ({{ current_user.role_label }})
+                    </span>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.logout') }}">Đăng xuất</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endif %}
+
+<div class="container-fluid px-3 px-md-4 py-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

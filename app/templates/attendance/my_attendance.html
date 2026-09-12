@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Chấm công{% endblock %}
+{% block content %}
+<h3 class="mb-4">Chấm công của tôi</h3>
+
+<div class="card p-4 mb-4" style="max-width: 500px;">
+    {% if open_shift %}
+        <p>Bạn đang trong ca, check-in lúc <strong>{{ open_shift.check_in | datetime_vn }}</strong></p>
+        <form method="POST" action="{{ url_for('attendance.check_out') }}">
+            <button class="btn btn-danger">Check-out</button>
+        </form>
+    {% else %}
+        <p class="text-muted">Bạn chưa check-in ca làm việc hôm nay.</p>
+        <form method="POST" action="{{ url_for('attendance.check_in') }}">
+            <button class="btn btn-success">Check-in</button>
+        </form>
+    {% endif %}
+</div>
+
+<h5>Lịch sử chấm công gần đây</h5>
+<div class="table-responsive">
+<table class="table table-hover bg-white">
+    <thead class="table-light">
+        <tr><th>Check-in</th><th>Check-out</th><th>Số giờ</th></tr>
+    </thead>
+    <tbody>
+        {% for r in history %}
+        <tr>
+            <td>{{ r.check_in | datetime_vn }}</td>
+            <td>{{ r.check_out | datetime_vn if r.check_out else '—' }}</td>
+            <td>{{ r.hours if r.hours is not none else '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="text-center text-muted py-4">Chưa có dữ liệu chấm công.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Đăng nhập - Quán Bia Manager{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 85vh;">
+    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%; border-radius: 16px;">
+        <div class="text-center mb-4">
+            <i class="bi bi-cup-straw" style="font-size: 3rem; color: #c8791a;"></i>
+            <h3 class="mt-2 fw-bold">Quán Bia Manager</h3>
+            <p class="text-muted">Hệ thống quản lý bán hàng</p>
+        </div>
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Tên đăng nhập</label>
+                <input type="text" class="form-control" name="username" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu</label>
+                <input type="password" class="form-control" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-warning w-100 fw-bold" style="background-color:#c8791a; border:none; color:white;">
+                Đăng nhập
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

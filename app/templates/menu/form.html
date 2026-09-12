@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Sửa món' if item else 'Thêm món' }}{% endblock %}
+{% block content %}
+<h3 class="mb-4">{{ 'Sửa món: ' + item.name if item else 'Thêm món mới' }}</h3>
+
+<form method="POST" class="card p-4" style="max-width: 700px;">
+    <div class="mb-3">
+        <label class="form-label">Tên món</label>
+        <input type="text" name="name" class="form-control" value="{{ item.name if item else '' }}" required>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Danh mục</label>
+            <select name="category_id" class="form-select">
+                <option value="">-- Chọn danh mục --</option>
+                {% for cat in categories %}
+                <option value="{{ cat._id }}" {% if item and item.category_id == cat._id %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Giá bán (đ)</label>
+            <input type="number" name="price" class="form-control" value="{{ item.price if item else '' }}" min="0" step="1000" required>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Đơn vị</label>
+            <input type="text" name="unit" class="form-control" value="{{ item.unit if item else 'ly' }}">
+        </div>
+    </div>
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" name="available" id="available"
+               {% if not item or item.available %}checked{% endif %}>
+        <label class="form-check-label" for="available">Đang bán</label>
+    </div>
+
+    <hr>
+    <h6>Công thức tiêu hao kho (tùy chọn)</h6>
+    <p class="text-muted small">Khi bán 1 {{ item.unit if item else 'đơn vị' }} món này, hệ thống sẽ tự động trừ số lượng nguyên liệu tương ứng trong kho.</p>
+    <div id="recipe-rows">
+        {% if item and item.recipe %}
+            {% for r in item.recipe %}
+            <div class="row g-2 mb-2 recipe-row">
+                <div class="col-6">
+                    <select name="recipe_item_id" class="form-select">
+                        <option value="">-- Nguyên liệu --</option>
+                        {% for ing in inventory_items %}
+                        <option value="{{ ing._id }}" {% if r.inventory_id == ing._id %}selected{% endif %}>{{ ing.name }} ({{ ing.unit }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-4">
+                    <input type="number" step="0.01" name="recipe_qty" class="form-control" placeholder="Số lượng" value="{{ r.qty }}">
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-outline-danger w-100 remove-row">&times;</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <button type="button" id="add-recipe-row" class="btn btn-sm btn-outline-secondary mb-3">+ Thêm nguyên liệu</button>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a href="{{ url_for('menu.index') }}" class="btn btn-outline-secondary">Hủy</a>
+    </div>
+</form>
+
+<template id="recipe-row-template">
+    <div class="row g-2 mb-2 recipe-row">
+        <div class="col-6">
+            <select name="recipe_item_id" class="form-select">
+                <option value="">-- Nguyên liệu --</option>
+                {% for ing in inventory_items %}
+                <option value="{{ ing._id }}">{{ ing.name }} ({{ ing.unit }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-4">
+            <input type="number" step="0.01" name="recipe_qty" class="form-control" placeholder="Số lượng">
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-outline-danger w-100 remove-row">&times;</button>
+        </div>
+    </div>
+</template>
+
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('add-recipe-row').addEventListener('click', function() {
+    const tpl = document.getElementById('recipe-row-template');
+    document.getElementById('recipe-rows').appendChild(tpl.content.cloneNode(true));
+});
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-row')) {
+        e.target.closest('.recipe-row').remove();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Sơ đồ bàn{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Sơ đồ bàn</h3>
+    <div>
+        <span class="badge bg-success p-2 me-2">■ Bàn trống</span>
+        <span class="badge bg-danger p-2">■ Đang phục vụ</span>
+    </div>
+</div>
+
+<div class="row g-3">
+    {% for t in tables %}
+    <div class="col-6 col-md-3 col-lg-2">
+        <a href="{{ url_for('order.view_table', table_id=t._id) }}" class="text-decoration-none text-dark">
+            <div class="card card-table {{ t.status }} p-3 text-center h-100">
+                <div class="fs-3"><i class="bi bi-table"></i></div>
+                <div class="fw-bold">{{ t.name }}</div>
+                <div class="text-muted small">{{ t.capacity }} chỗ</div>
+                {% if t.open_order %}
+                <div class="mt-2 fw-bold text-danger">{{ t.subtotal | currency }}</div>
+                {% endif %}
+            </div>
+        </a>
+    </div>
+    {% else %}
+    <div class="col-12 text-center text-muted py-5">Chưa có bàn nào. Vào "Quản lý bàn" để thêm.</div>
+    {% endfor %}
+</div>
+{% endblock %}

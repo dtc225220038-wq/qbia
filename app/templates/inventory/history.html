@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Lịch sử nhập/xuất kho{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Lịch sử nhập/xuất kho</h3>
+    <a href="{{ url_for('inventory.index') }}" class="btn btn-outline-secondary btn-sm">&larr; Quay lại</a>
+</div>
+
+<div class="table-responsive">
+<table class="table table-hover bg-white">
+    <thead class="table-light">
+        <tr><th>Thời gian</th><th>Nguyên liệu</th><th>Loại</th><th>Số lượng</th><th>Ghi chú</th></tr>
+    </thead>
+    <tbody>
+        {% for tx in transactions %}
+        <tr>
+            <td>{{ tx.created_at | datetime_vn }}</td>
+            <td>{{ tx.item_name }}</td>
+            <td>
+                {% if tx.type == 'nhap' %}
+                <span class="badge bg-success">Nhập kho</span>
+                {% else %}
+                <span class="badge bg-danger">Xuất kho</span>
+                {% endif %}
+            </td>
+            <td>{{ tx.qty }}</td>
+            <td class="text-muted">{{ tx.note }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-4">Chưa có giao dịch nào.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}
